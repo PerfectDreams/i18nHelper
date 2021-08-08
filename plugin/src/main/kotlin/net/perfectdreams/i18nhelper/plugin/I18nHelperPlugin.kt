@@ -6,6 +6,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.Taggable
 import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -115,10 +116,36 @@ class I18nHelperPlugin : Plugin<Project> {
     }
 
     fun addI18nKeysData(classPackage: String, children: List<String>, firstChild: String, prefix: String, currentKey: Map<String, Any>): TypeSpec {
-        val obj = TypeSpec.objectBuilder(firstChild.capitalize())
+        val obj = TypeSpec.objectBuilder(
+            if (prefix.isEmpty()) { // Do not change the "I18nKeysData" class name to be lowercase
+                firstChild
+            } else {
+                firstChild.toLowerCase().capitalize()
+            }
+        )
+
+        println("Children: $children")
 
         for ((key, value) in currentKey) {
             if (value is Map<*, *>) {
+                println("is a map, key: $key")
+                obj.addProperty(
+                    PropertySpec.builder(
+                        key.capitalize(),
+                        ClassName(
+                            classPackage,
+                            "I18nKeysData",
+                            *(children + key).map { ("Inner$it".toLowerCase().capitalize()) }
+                                .toTypedArray()
+                        )
+                    ).initializer(
+                        "${classPackage}.I18nKeysData.${
+                            (children + key).joinToString(".") {
+                                ("Inner$it".toLowerCase().capitalize())
+                            }
+                        }"
+                    ).build()
+                )
                 obj.addType(
                     addI18nKeysData(
                         classPackage,
@@ -126,80 +153,93 @@ class I18nHelperPlugin : Plugin<Project> {
                             .apply {
                                 this.add(key.capitalize())
                             },
-                        key,
+                        "Inner$key",
                         "$prefix$key.",
                         value as Map<String, Any>
                     )
                 )
             } else if (value is List<*>) {
-                obj.addType(
-                    convertToKotlinPropertyOrMethod(classPackage, children, "ListI18nData", key, value.joinToString("\n")) // We will join the list into a single string, to make it easier to process them
-                )
+                convertToKotlinPropertyOrFunctionAndAddToObject(classPackage, children, "ListI18nData", obj, key, value.joinToString("\n")) // We will join the list into a single string, to make it easier to process them
             } else {
-                obj.addType(
-                    convertToKotlinPropertyOrMethod(classPackage, children, "StringI18nData", key, value as String)
-                )
+                convertToKotlinPropertyOrFunctionAndAddToObject(classPackage, children, "StringI18nData", obj, key, value as String)
             }
         }
 
         return obj.build()
     }
 
-    private fun convertToKotlinPropertyOrMethod(classPackage: String, children: List<String>, classKeyToBeUsed: String, key: String, value: String): TypeSpec {
+    private fun convertToKotlinPropertyOrFunctionAndAddToObject(classPackage: String, children: List<String>, classKeyToBeUsed: String, obj: TypeSpec.Builder, key: String, value: String) {
         val node = MessagePatternUtil.buildMessageNode(value)
         val hasAnyArgument = node.contents.any { it is MessagePatternUtil.ArgNode }
 
-        val classBuilder = if (hasAnyArgument) {
-            TypeSpec.classBuilder(key.capitalize())
-        } else {
-            TypeSpec.objectBuilder(key.capitalize())
-        }
-
-        val arguments = mutableListOf<String>()
-
         if (hasAnyArgument) {
-            val constructor = FunSpec.constructorBuilder()
-
-            node.contents.forEach {
-                if (it is MessagePatternUtil.ArgNode) {
-                    when (it.typeName) {
-                        "integer" -> constructor.addParameter(it.name, Int::class)
-                        "short" -> constructor.addParameter(it.name, Short::class)
-                        "long" -> constructor.addParameter(it.name, Long::class)
-                        else -> constructor.addParameter(it.name, Any::class)
-                    }
-
-                    arguments.add(it.name)
-                }
-            }
-
-            classBuilder.primaryConstructor(constructor.build())
+            obj.addFunction(convertToKotlinFunction(classPackage, children, classKeyToBeUsed, node, key, value))
+        } else {
+            obj.addProperty(convertToKotlinProperty(classPackage, children, classKeyToBeUsed, key, value))
         }
+    }
 
-        return classBuilder
-            .addSuperclassConstructorParameter(
-                CodeBlock.builder()
-                    .add("${classPackage}.I18nKeys.${
-                        children.toMutableList().apply {
-                            this.add(key.capitalize())
-                        }.joinToString(".")
-                    }")
-                    .add(", ")
-                    .add("mutableMapOf(")
-                    .apply {
-                        for (argument in arguments) {
-                            add("%S to $argument,", argument)
-                        }
-                    }
-                    .add(")")
-                    .build()
-            )
-            .superclass(
+    private fun convertToKotlinFunction(classPackage: String, children: List<String>, classKeyToBeUsed: String, node: MessagePatternUtil.MessageNode, key: String, value: String): FunSpec {
+        val arguments = mutableListOf<String>()
+        val function = FunSpec.builder(key.capitalize())
+            .returns(
                 ClassName(
                     "net.perfectdreams.i18nhelper.core.keydata",
                     classKeyToBeUsed
                 )
             )
+
+        node.contents.forEach {
+            if (it is MessagePatternUtil.ArgNode) {
+                when (it.typeName) {
+                    "integer" -> function.addParameter(it.name, Int::class)
+                    "short" -> function.addParameter(it.name, Short::class)
+                    "long" -> function.addParameter(it.name, Long::class)
+                    else -> function.addParameter(it.name, Any::class)
+                }
+
+                arguments.add(it.name)
+            }
+        }
+
+        function.addCode(
+            CodeBlock.builder()
+                .add("return ")
+                .add("net.perfectdreams.i18nhelper.core.keydata.$classKeyToBeUsed(${"${classPackage}.I18nKeys.${
+                    children.toMutableList().apply {
+                        this.add(key.capitalize())
+                    }.joinToString(".")
+                }"}")
+                .add(", ")
+                .add("mutableMapOf(")
+                .apply {
+                    for (argument in arguments) {
+                        add("%S to $argument,", argument)
+                    }
+                }
+                .add(")")
+                .add(")")
+                .build()
+        )
+
+        return function.build()
+    }
+
+    private fun convertToKotlinProperty(classPackage: String, children: List<String>, classKeyToBeUsed: String, key: String, value: String): PropertySpec {
+        // If there isn't any arguments, we can use a property!
+        // So let's create the property and return it here :)
+        return PropertySpec.builder(
+            key.capitalize(),
+            ClassName(
+                "net.perfectdreams.i18nhelper.core.keydata",
+                classKeyToBeUsed
+            )
+        )
+            .initializer("$classKeyToBeUsed(${"${classPackage}.I18nKeys.${
+                children.toMutableList().apply {
+                    this.add(key.capitalize())
+                }.joinToString(".")
+            }"}, emptyMap())")
             .build()
     }
 }
