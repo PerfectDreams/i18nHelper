@@ -124,11 +124,8 @@ class I18nHelperPlugin : Plugin<Project> {
             }
         )
 
-        println("Children: $children")
-
         for ((key, value) in currentKey) {
             if (value is Map<*, *>) {
-                println("is a map, key: $key")
                 obj.addProperty(
                     PropertySpec.builder(
                         key.capitalize(),
