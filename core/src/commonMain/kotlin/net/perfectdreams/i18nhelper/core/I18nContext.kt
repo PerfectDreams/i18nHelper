@@ -1,10 +1,10 @@
 package net.perfectdreams.i18nhelper.core
 
 import mu.KotlinLogging
-import net.perfectdreams.i18nhelper.core.keydata.ListTranslationData
-import net.perfectdreams.i18nhelper.core.keydata.StringTranslationData
-import net.perfectdreams.i18nhelper.core.keys.ListTranslationKey
-import net.perfectdreams.i18nhelper.core.keys.StringTranslationKey
+import net.perfectdreams.i18nhelper.core.keydata.ListI18nData
+import net.perfectdreams.i18nhelper.core.keydata.StringI18nData
+import net.perfectdreams.i18nhelper.core.keys.ListI18nKey
+import net.perfectdreams.i18nhelper.core.keys.StringI18nKey
 
 class I18nContext(
     val formatter: Formatter,
@@ -15,11 +15,11 @@ class I18nContext(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun get(key: StringTranslationKey, arguments: MutableMap<String, Any?>.() -> Unit) = get(key, buildMap(arguments))
-    fun get(key: StringTranslationKey, arguments: Map<String, Any?> = mapOf()) = get(key.key, arguments)
+    fun get(key: StringI18nKey, arguments: MutableMap<String, Any?>.() -> Unit) = get(key, buildMap(arguments))
+    fun get(key: StringI18nKey, arguments: Map<String, Any?> = mapOf()) = get(key.key, arguments)
     @OptIn(ExperimentalStdlibApi::class)
     fun get(key: String, arguments: MutableMap<String, Any?>.() -> Unit) = get(key, buildMap(arguments))
-    fun get(key: StringTranslationData) = get(key.key.key, key.arguments)
+    fun get(key: StringI18nData) = get(key.key.key, key.arguments)
 
     fun get(key: String, arguments: Map<String, Any?> = mapOf()): String {
         try {
@@ -32,9 +32,9 @@ class I18nContext(
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun get(key: ListTranslationKey, arguments: MutableMap<String, Any?>.() -> Unit) = get(key, buildMap(arguments))
-    fun get(key: ListTranslationKey, arguments: Map<String, Any?> = mapOf()) = getList(key.key, arguments)
-    fun get(key: ListTranslationData) = getList(key.key.key, key.arguments)
+    fun get(key: ListI18nKey, arguments: MutableMap<String, Any?>.() -> Unit) = get(key, buildMap(arguments))
+    fun get(key: ListI18nKey, arguments: Map<String, Any?> = mapOf()) = getList(key.key, arguments)
+    fun get(key: ListI18nData) = getList(key.key.key, key.arguments)
     @OptIn(ExperimentalStdlibApi::class)
     fun getList(key: String, arguments: MutableMap<String, Any?>.() -> Unit) = getList(key, buildMap(arguments))
 
@@ -54,11 +54,11 @@ class I18nContext(
 
         for ((key, value) in map) {
             when (value) {
-                is StringTranslationKey -> {
+                is StringI18nKey -> {
                     // We will use a copy of the current map but without the "key", to avoid recursion issues
                     newMap[key] = get(value, map.toMutableMap().apply { this.remove(key) })
                 }
-                is StringTranslationData -> {
+                is StringI18nData -> {
                     // We will use a copy of the current map but without the "key", to avoid recursion issues
                     newMap[key] = get(value)
                 }
