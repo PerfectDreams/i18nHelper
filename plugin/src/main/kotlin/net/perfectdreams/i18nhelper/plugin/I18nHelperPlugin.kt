@@ -1,5 +1,6 @@
 package net.perfectdreams.i18nhelper.plugin
 
+import com.ibm.icu.text.MessageFormat
 import com.ibm.icu.text.MessagePatternUtil
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
@@ -216,7 +217,7 @@ class I18nHelperPlugin : Plugin<Project> {
     }
 
     private fun convertToKotlinFunction(classPackage: String, children: List<String>, classKeyToBeUsed: String, node: MessagePatternUtil.MessageNode, key: String, value: String): FunSpec {
-        val arguments = mutableListOf<String>()
+        val arguments = mutableSetOf<String>()
         val function = FunSpec.builder(key.capitalize())
             .returns(
                 ClassName(
@@ -225,16 +226,27 @@ class I18nHelperPlugin : Plugin<Project> {
                 )
             )
 
-        node.contents.forEach {
-            if (it is MessagePatternUtil.ArgNode) {
-                when (it.typeName) {
-                    "integer" -> function.addParameter(it.name, Int::class)
-                    "short" -> function.addParameter(it.name, Short::class)
-                    "long" -> function.addParameter(it.name, Long::class)
-                    else -> function.addParameter(it.name, Any::class)
+        for (innerNode in node.contents) {
+            if (innerNode is MessagePatternUtil.ArgNode) {
+                // Sometimes, lists may have duplicate arguments, so just ignore if they have one
+                if (arguments.contains(innerNode.name))
+                    continue
+
+                when (innerNode.typeName) {
+                    "number" -> {
+                        when (innerNode.simpleStyle) {
+                            "integer" -> function.addParameter(innerNode.name, Int::class)
+                            "short" -> function.addParameter(innerNode.name, Short::class)
+                            "long" -> function.addParameter(innerNode.name, Long::class)
+                            else -> function.addParameter(innerNode.name, Any::class)
+                        }
+                    }
+                    else -> {
+                        function.addParameter(innerNode.name, Any::class)
+                    }
                 }
 
-                arguments.add(it.name)
+                arguments.add(innerNode.name)
             }
         }
 
