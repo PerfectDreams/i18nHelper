@@ -80,6 +80,9 @@ class I18nHelperPlugin : Plugin<Project> {
             // This makes the generateI18nKeys task to always be ran after the compileKotlin step
             // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
             println("Project: $project (${project.name})")
+            project.tasks.forEach {
+                println("Project: $project task $it (${it.name}) ")
+            }
             project.tasks.filter { it.name.startsWith("compileKotlin") }.forEach {
                 println("Task $it (${it.name}) will depend on $task (${task.name})")
                 it.dependsOn(task)
