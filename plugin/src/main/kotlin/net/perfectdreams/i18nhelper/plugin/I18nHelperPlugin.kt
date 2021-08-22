@@ -25,7 +25,11 @@ class I18nHelperPlugin : Plugin<Project> {
         with(target) {
             val extension = project.extensions.create<I18nHelperPluginExtension>("i18nHelper")
 
-            tasks.register(TASK_NAME) {
+            println("Registering plugin on ${target.name}, task name: $TASK_NAME")
+
+            val task = tasks.register(TASK_NAME) {
+                println("Inside task registering")
+
                 doLast {
                     val localeFolder = File(this.project.buildDir, "generated/languages")
                     localeFolder.deleteRecursively()
@@ -75,8 +79,10 @@ class I18nHelperPlugin : Plugin<Project> {
             // HACKY WORKAROUND!!!
             // This makes the generateI18nKeys task to always be ran after the compileKotlin step
             // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
+            println("Project: $project (${project.name})")
             project.tasks.filter { it.name.startsWith("compileKotlin") }.forEach {
-                it.dependsOn(TASK_NAME)
+                println("Task $it (${it.name}) will depend on $task (${task.name})")
+                it.dependsOn(task)
             }
         }
     }
