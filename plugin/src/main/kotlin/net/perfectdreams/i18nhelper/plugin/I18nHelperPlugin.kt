@@ -26,13 +26,6 @@ class I18nHelperPlugin : Plugin<Project> {
             val extension = project.extensions.create<I18nHelperPluginExtension>("i18nHelper")
 
             tasks.register(TASK_NAME) {
-                // HACKY WORKAROUND!!!
-                // This makes the generateI18nKeys task to always be ran after the compileKotlin step
-                // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
-                project.tasks.filter { it.name.startsWith("compileKotlin") }.forEach {
-                    it.dependsOn(TASK_NAME)
-                }
-
                 doLast {
                     val localeFolder = File(this.project.buildDir, "generated/languages")
                     localeFolder.deleteRecursively()
@@ -77,6 +70,13 @@ class I18nHelperPlugin : Plugin<Project> {
                     i18nKeysFile.build().writeTo(localeFolder)
                     i18nDataFile.build().writeTo(localeFolder)
                 }
+            }
+
+            // HACKY WORKAROUND!!!
+            // This makes the generateI18nKeys task to always be ran after the compileKotlin step
+            // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
+            project.tasks.filter { it.name.startsWith("compileKotlin") }.forEach {
+                it.dependsOn(TASK_NAME)
             }
         }
     }
