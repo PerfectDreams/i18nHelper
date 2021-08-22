@@ -30,6 +30,13 @@ class I18nHelperPlugin : Plugin<Project> {
             val task = tasks.register(TASK_NAME) {
                 println("Inside task registering")
 
+                doFirst {
+                    println("DO FIRST - Project: $project (${project.name})")
+                    project.tasks.forEach {
+                        println("DO FIRST - Project: $project task $it (${it.name}) ")
+                    }
+                }
+
                 doLast {
                     val localeFolder = File(this.project.buildDir, "generated/languages")
                     localeFolder.deleteRecursively()
