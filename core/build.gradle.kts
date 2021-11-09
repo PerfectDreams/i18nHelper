@@ -11,7 +11,7 @@ kotlin {
         withJava()
     }
 
-    js(IR) {
+    js(BOTH) {
         browser()
     }
 
