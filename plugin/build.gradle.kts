@@ -4,6 +4,9 @@ plugins {
     `java-gradle-plugin`
 }
 
+group = "net.perfectdreams.i18nhelper"
+version = "0.0.3-SNAPSHOT"
+
 repositories {
     google()
     gradlePluginPortal()
