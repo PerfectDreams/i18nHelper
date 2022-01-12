@@ -37,7 +37,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 publishing {
     repositories {
         maven {
-            name = "PerfectDreams"
+            name = "PerfectDreamsPlugin"
             url = uri("https://repo.perfectdreams.net/")
             credentials(PasswordCredentials::class)
         }
