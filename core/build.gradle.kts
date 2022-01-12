@@ -20,8 +20,8 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.2.2")
-                implementation("io.github.microutils:kotlin-logging:2.0.10")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                implementation("io.github.microutils:kotlin-logging:2.1.21")
             }
         }
     }

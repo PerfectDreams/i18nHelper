@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     api(project(":core"))
-    implementation("com.ibm.icu:icu4j:69.1")
+    implementation("com.ibm.icu:icu4j:70.1")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {

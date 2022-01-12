@@ -7,12 +7,13 @@ plugins {
 repositories {
     google()
     gradlePluginPortal()
+    mavenCentral()
 }
 
 dependencies {
-    implementation("com.squareup:kotlinpoet:1.9.0")
+    implementation("com.squareup:kotlinpoet:1.10.2")
     implementation("org.yaml:snakeyaml:1.29")
-    implementation("com.ibm.icu:icu4j:69.1")
+    implementation("com.ibm.icu:icu4j:70.1")
 }
 
 gradlePlugin {

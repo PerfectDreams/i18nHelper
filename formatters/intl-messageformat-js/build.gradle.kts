@@ -16,7 +16,7 @@ kotlin {
                 api(project(":core"))
 
                 // Used for message formatting
-                implementation(npm("intl-messageformat", "9.8.1"))
+                implementation(npm("intl-messageformat", "9.11.1"))
             }
         }
     }

@@ -8,8 +8,8 @@ plugins {
 
 dependencies {
     api(project(":formatters:icu-messageformat-jvm"))
-    implementation("com.ibm.icu:icu4j:69.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
+    implementation("com.ibm.icu:icu4j:70.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }
 
 i18nHelper {
