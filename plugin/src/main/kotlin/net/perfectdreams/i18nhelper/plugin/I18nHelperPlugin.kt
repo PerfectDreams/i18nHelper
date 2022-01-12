@@ -1,13 +1,11 @@
 package net.perfectdreams.i18nhelper.plugin
 
-import com.ibm.icu.text.MessageFormat
 import com.ibm.icu.text.MessagePatternUtil
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.Taggable
 import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -233,25 +231,11 @@ class I18nHelperPlugin : Plugin<Project> {
 
         for (innerNode in node.contents) {
             if (innerNode is MessagePatternUtil.ArgNode) {
-                // Sometimes, lists may have duplicate arguments, so just ignore if they have one
-                if (arguments.contains(innerNode.name))
-                    continue
-
-                when (innerNode.typeName) {
-                    "number" -> {
-                        when (innerNode.simpleStyle) {
-                            "integer" -> function.addParameter(innerNode.name, Int::class)
-                            "short" -> function.addParameter(innerNode.name, Short::class)
-                            "long" -> function.addParameter(innerNode.name, Long::class)
-                            else -> function.addParameter(innerNode.name, Any::class)
-                        }
-                    }
-                    else -> {
-                        function.addParameter(innerNode.name, Any::class)
-                    }
-                }
-
-                arguments.add(innerNode.name)
+                convertNodeToFunctionParameters(
+                    innerNode,
+                    arguments,
+                    function
+                )
             }
         }
 
@@ -276,6 +260,45 @@ class I18nHelperPlugin : Plugin<Project> {
         )
 
         return function.build()
+    }
+
+    private fun convertNodeToFunctionParameters(
+        node: MessagePatternUtil.ArgNode,
+        arguments: MutableSet<String>,
+        function: FunSpec.Builder
+    ): FunSpec.Builder {
+        // Sometimes, lists may have duplicate arguments, so just ignore if they have one
+        if (arguments.contains(node.name))
+            return function
+
+        when (node.typeName) {
+            "number" -> {
+                when (node.simpleStyle) {
+                    "integer" -> function.addParameter(node.name, Int::class)
+                    "short" -> function.addParameter(node.name, Short::class)
+                    "long" -> function.addParameter(node.name, Long::class)
+                    else -> function.addParameter(node.name, Any::class)
+                }
+            }
+            "plural" -> {
+                function.addParameter(node.name, Any::class)
+
+                for (variant in node.complexStyle.variants) {
+                    variant.message.contents.forEach {
+                        if (it is MessagePatternUtil.ArgNode) {
+                            convertNodeToFunctionParameters(it, arguments, function)
+                        }
+                    }
+                }
+            }
+            else -> {
+                function.addParameter(node.name, Any::class)
+            }
+        }
+
+        arguments.add(node.name)
+
+        return function
     }
 
     private fun convertToKotlinProperty(classPackage: String, children: List<String>, classKeyToBeUsed: String, key: String, value: String): PropertySpec {
