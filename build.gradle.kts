@@ -1,7 +1,7 @@
 plugins {
     `maven-publish`
-    kotlin("multiplatform") version "1.5.21" apply false
-    kotlin("plugin.serialization") version "1.5.21" apply false
+    kotlin("multiplatform") version "1.6.10" apply false
+    kotlin("plugin.serialization") version "1.6.10" apply false
 }
 
 allprojects {
@@ -22,11 +22,7 @@ subprojects {
             maven {
                 name = "PerfectDreams"
                 url = uri("https://repo.perfectdreams.net/")
-
-                credentials {
-                    username = System.getProperty("USERNAME") ?: System.getenv("USERNAME")
-                    password = System.getProperty("PASSWORD") ?: System.getenv("PASSWORD")
-                }
+                credentials(PasswordCredentials::class)
             }
         }
     }

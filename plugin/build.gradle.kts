@@ -1,4 +1,5 @@
 plugins {
+    `maven-publish`
     `kotlin-dsl`
     `java-gradle-plugin`
 }
@@ -26,5 +27,15 @@ gradlePlugin {
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
     kotlinOptions {
         jvmTarget = "1.8"
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "PerfectDreams"
+            url = uri("https://repo.perfectdreams.net/")
+            credentials(PasswordCredentials::class)
+        }
     }
 }

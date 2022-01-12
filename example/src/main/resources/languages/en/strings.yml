@@ -1,0 +1,15 @@
+hello: "Hello World!"
+helloWithArguments: "Hello with {one} {two} {three} arguments!"
+
+nested:
+  nestedKey: "This is a nested key, here an argument: {owo}"
+  moreNesting:
+    finalKey: "Okay, enough playing around!"
+    finalWithArgument: "Okay, now that's enough"
+    list:
+      - "This is a list! {yay}"
+      - "And here's a second string {wow}"
+subfolder:
+  mergeTest: "This should be merged with the more-strings.yml"
+
+testKey: "Você não tem ações suficientes para vender! No momento você possui **{stockCount, plural, one {# ação de `{ticker}`} other {# ações de `{ticker}`}}**!"
