@@ -32,13 +32,3 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
         jvmTarget = "1.8"
     }
 }
-
-publishing {
-    repositories {
-        maven {
-            name = "PerfectDreams"
-            url = uri("https://repo.perfectdreams.net/")
-            credentials(PasswordCredentials::class)
-        }
-    }
-}
