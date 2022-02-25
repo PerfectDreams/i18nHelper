@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://repo.perfectdreams.net/")
+    }
+}
+
 rootProject.name = "i18nHelper"
 
 includeBuild("plugin")
