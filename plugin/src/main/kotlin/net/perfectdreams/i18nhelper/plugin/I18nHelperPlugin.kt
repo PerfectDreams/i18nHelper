@@ -71,7 +71,7 @@ class I18nHelperPlugin : Plugin<Project> {
             }
 
             // HACKY WORKAROUND!!!
-            // This makes the generateI18nKeys task to always be ran after the compileKotlin step
+            // This makes the generateI18nKeys task to always be ran before the compileKotlin step
             // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
             //
             // We need to keep it within the "afterEvaluate" block because, if it isn't, the compile*InsertStuffHere* tasks won't exist!
