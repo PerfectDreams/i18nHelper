@@ -74,10 +74,12 @@ class I18nHelperPlugin : Plugin<Project> {
             // This makes the generateI18nKeys task to always be ran after the compileKotlin step
             // We need to do this (instead of using withType) because, for some reason, it doesn't work and the task isn't executed.
             //
-            // We need to keep it within the "afterEvaluate" block because, if it isn't, the compileKotlin*InsertStuffHere* tasks won't exist!
+            // We need to keep it within the "afterEvaluate" block because, if it isn't, the compile*InsertStuffHere* tasks won't exist!
+            //
+            // And the reason it is "compile" instead of compileKotlin is because, in Kotlin 1.6.20-M1, a task named "compileCommonMainKotlinMetadata" was added
             // https://stackoverflow.com/a/58763804/7271796
             project.afterEvaluate {
-                project.tasks.filter { it.name.startsWith("compileKotlin") }.forEach {
+                project.tasks.filter { it.name.startsWith("compile") }.forEach {
                     it.dependsOn(task)
                 }
             }
