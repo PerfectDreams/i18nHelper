@@ -12,8 +12,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 }
 
-i18nHelper {
-    languageSourceFolder.set("src/main/resources/languages/en/")
+val generateI18nKeys = tasks.register<net.perfectdreams.i18nhelper.plugin.GenerateI18nKeysTask>("generateI18nKeys") {
+    languageSourceFolder.set(file("src/main/resources/languages/en/"))
+    languageTargetFolder.set(file("$buildDir/generated/languages"))
     generatedPackage.set("net.perfectdreams.i18nhelper.example")
     translationLoadTransform.set { file, map ->
         if (file.parentFile.name == "subfolder")
@@ -21,10 +22,11 @@ i18nHelper {
         else
             map
     }
+
 }
 
 sourceSets.main {
-    java.srcDir("build/generated/languages")
+    java.srcDir(generateI18nKeys.get().languageTargetFolder)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
