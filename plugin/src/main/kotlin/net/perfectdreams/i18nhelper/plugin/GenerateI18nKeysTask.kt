@@ -40,10 +40,8 @@ abstract class GenerateI18nKeysTask  : DefaultTask() {
         val generatedPackage = generatedPackage.get()
 
         val sourceFolder = languageSourceFolder.asFile.get()
-        val targetFolder = languageTargetFolder.asFile.get()
-        targetFolder.deleteRecursively()
-
-        val localeFolder = File(this.project.buildDir, "generated/languages")
+        val localeFolder = languageTargetFolder.asFile.get()
+        
         localeFolder.deleteRecursively()
         localeFolder.mkdirs()
 
