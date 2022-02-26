@@ -26,7 +26,8 @@ val generateI18nKeys = tasks.register<net.perfectdreams.i18nhelper.plugin.Genera
 }
 
 sourceSets.main {
-    java.srcDir(generateI18nKeys.get().languageTargetFolder)
+    // If a task only has one output, you can reference the task itself
+    java.srcDir(generateI18nKeys)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
