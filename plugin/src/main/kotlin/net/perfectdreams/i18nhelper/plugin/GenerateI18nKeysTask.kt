@@ -10,20 +10,26 @@ import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
-abstract class GenerateI18nKeysTask  : DefaultTask() {
+// This makes the task only be called if a file is changed or any of the attributes in the task (like "generatedPackage") are changed.
+@CacheableTask
+abstract class GenerateI18nKeysTask : DefaultTask() {
     companion object {
         private val yaml = Yaml()
     }
 
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val languageSourceFolder: DirectoryProperty
 
     @get:Input
@@ -41,7 +47,7 @@ abstract class GenerateI18nKeysTask  : DefaultTask() {
 
         val sourceFolder = languageSourceFolder.asFile.get()
         val localeFolder = languageTargetFolder.asFile.get()
-        
+
         localeFolder.deleteRecursively()
         localeFolder.mkdirs()
 
