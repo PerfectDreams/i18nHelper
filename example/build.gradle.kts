@@ -18,7 +18,7 @@ val generateI18nKeys = tasks.register<net.perfectdreams.i18nhelper.plugin.Genera
     generatedPackage.set("net.perfectdreams.i18nhelper.example")
     translationLoadTransform.set { file, map ->
         if (file.parentFile.name == "subfolder")
-            mapOf("subfolder" to map)
+            mutableMapOf("subfolder" to map)
         else
             map
     }
@@ -28,10 +28,4 @@ val generateI18nKeys = tasks.register<net.perfectdreams.i18nhelper.plugin.Genera
 sourceSets.main {
     // If a task only has one output, you can reference the task itself
     java.srcDir(generateI18nKeys)
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 }

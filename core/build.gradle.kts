@@ -5,14 +5,9 @@ plugins {
 }
 
 kotlin {
-   jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
-        }
-        withJava()
-    }
+    jvm {}
 
-    js(BOTH) {
+    js {
         browser()
     }
 
@@ -24,11 +19,5 @@ kotlin {
                 implementation("io.github.microutils:kotlin-logging:2.1.21")
             }
         }
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 }

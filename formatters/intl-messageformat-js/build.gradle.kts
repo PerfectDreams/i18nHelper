@@ -5,13 +5,13 @@ plugins {
 }
 
 kotlin {
-    js(BOTH) {
+    js {
         browser()
         nodejs()
     }
 
     sourceSets {
-        val jsMain by getting {
+        jsMain {
             dependencies {
                 api(project(":core"))
 

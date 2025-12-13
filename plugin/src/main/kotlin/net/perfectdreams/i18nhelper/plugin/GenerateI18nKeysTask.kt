@@ -20,6 +20,8 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.InputChanges
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.util.Locale
+import java.util.Locale.getDefault
 
 // This makes the task only be called if a file is changed or any of the attributes in the task (like "generatedPackage") are changed.
 @CacheableTask
@@ -90,7 +92,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
 
 
     fun addI18nKeys(firstChild: String, prefix: String, currentKey: Map<String, Any>): TypeSpec {
-        val obj = TypeSpec.objectBuilder(firstChild.capitalize())
+        val obj = TypeSpec.objectBuilder(firstChild.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
 
         for ((key, value) in currentKey) {
             if (value is Map<*, *>) {
@@ -104,7 +106,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
             } else if (value is List<*>) {
                 obj.addProperty(
                     PropertySpec.builder(
-                        key.capitalize(),
+                        key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() },
                         ClassName("net.perfectdreams.i18nhelper.core.keys", "ListI18nKey")
                     )
                         .initializer("ListI18nKey(\"$prefix$key\")")
@@ -113,7 +115,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
             } else {
                 obj.addProperty(
                     PropertySpec.builder(
-                        key.capitalize(),
+                        key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() },
                         ClassName("net.perfectdreams.i18nhelper.core.keys", "StringI18nKey")
                     )
                         .initializer("StringI18nKey(\"$prefix$key\")")
@@ -148,9 +150,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
     }
 
     private fun loadTranslationFileToMap(file: File, map: MutableMap<String, Any>, loadTransform: LoadTransformCallback) {
-        val loadedMap = yaml.load<Map<String, Any>>(
-            file.readText()
-        )
+        val loadedMap = yaml.load<Map<String, Any>>(file.readText()).toMutableMap()
         val result = loadTransform.invoke(file, loadedMap)
 
         // I don't think this is a good solution, but hey, it works...
@@ -168,7 +168,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
             if (prefix.isEmpty()) { // Do not change the "I18nKeysData" class name to be lowercase
                 firstChild
             } else {
-                firstChild.toLowerCase().capitalize()
+                firstChild.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }
             }
         )
 
@@ -176,17 +176,17 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
             if (value is Map<*, *>) {
                 obj.addProperty(
                     PropertySpec.builder(
-                        key.capitalize(),
+                        key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() },
                         ClassName(
                             classPackage,
                             "I18nKeysData",
-                            *(children + key).map { ("Inner$it".toLowerCase().capitalize()) }
+                            *(children + key).map { ("Inner$it".lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() }) }
                                 .toTypedArray()
                         )
                     ).initializer(
                         "${classPackage}.I18nKeysData.${
                             (children + key).joinToString(".") {
-                                ("Inner$it".toLowerCase().capitalize())
+                                ("Inner$it".lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
                             }
                         }"
                     ).build()
@@ -196,7 +196,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
                         classPackage,
                         children.toMutableList()
                             .apply {
-                                this.add(key.capitalize())
+                                this.add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
                             },
                         "Inner$key",
                         "$prefix$key.",
@@ -226,7 +226,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
 
     private fun convertToKotlinFunction(classPackage: String, children: List<String>, classKeyToBeUsed: String, node: MessagePatternUtil.MessageNode, key: String, value: String): FunSpec {
         val arguments = mutableSetOf<String>()
-        val function = FunSpec.builder(key.capitalize())
+        val function = FunSpec.builder(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
             .returns(
                 ClassName(
                     "net.perfectdreams.i18nhelper.core.keydata",
@@ -249,7 +249,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
                 .add("return ")
                 .add("net.perfectdreams.i18nhelper.core.keydata.$classKeyToBeUsed(${"${classPackage}.I18nKeys.${
                     children.toMutableList().apply {
-                        this.add(key.capitalize())
+                        this.add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
                     }.joinToString(".")
                 }"}")
                 .add(", ")
@@ -310,7 +310,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
         // If there isn't any arguments, we can use a property!
         // So let's create the property and return it here :)
         return PropertySpec.builder(
-            key.capitalize(),
+            key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() },
             ClassName(
                 "net.perfectdreams.i18nhelper.core.keydata",
                 classKeyToBeUsed
@@ -318,7 +318,7 @@ abstract class GenerateI18nKeysTask : DefaultTask() {
         )
             .initializer("$classKeyToBeUsed(${"${classPackage}.I18nKeys.${
                 children.toMutableList().apply {
-                    this.add(key.capitalize())
+                    this.add(key.replaceFirstChar { if (it.isLowerCase()) it.titlecase(getDefault()) else it.toString() })
                 }.joinToString(".")
             }"}, emptyMap())")
             .build()

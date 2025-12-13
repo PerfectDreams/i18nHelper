@@ -9,12 +9,6 @@ dependencies {
     implementation("com.ibm.icu:icu4j:70.1")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-
 publishing {
     publications {
         register("PerfectDreams", MavenPublication::class.java) {
