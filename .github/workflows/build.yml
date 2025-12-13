@@ -29,15 +29,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build Plugin with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: "--include-build plugin :plugin:tasks"
-
       - name: Build and Publish with Gradle
         env:
           # GitHub Actions has 7GBs of available RAM for workers, so let's bump it a bit up!
           GRADLE_OPTS: -Xmx4096m -Xms4096m
           ORG_GRADLE_PROJECT_PerfectDreamsUsername: ${{ secrets.PERFECTDREAMS_REPO_USERNAME }}
           ORG_GRADLE_PROJECT_PerfectDreamsPassword: ${{ secrets.PERFECTDREAMS_REPO_PASSWORD }}
-        run: ./gradlew --include-build build publish plugin :plugin:publish --no-daemon
+        run: ./gradlew build publish --no-daemon
