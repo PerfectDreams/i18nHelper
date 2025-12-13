@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.perfectdreams.i18nhelper"
-version = "0.0.5-SNAPSHOT"
+version = "0.0.7"
 
 repositories {
     google()
