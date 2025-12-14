@@ -8,8 +8,8 @@ plugins {
 
 dependencies {
     api(project(":formatters:icu-messageformat-jvm"))
-    implementation("com.ibm.icu:icu4j:70.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("com.ibm.icu:icu4j:78.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 }
 
 val generateI18nKeys = tasks.register<net.perfectdreams.i18nhelper.plugin.GenerateI18nKeysTask>("generateI18nKeys") {

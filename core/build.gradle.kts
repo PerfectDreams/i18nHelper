@@ -15,7 +15,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.2")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0")
                 implementation("io.github.microutils:kotlin-logging:2.1.21")
             }
         }

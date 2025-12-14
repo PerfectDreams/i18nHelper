@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "net.perfectdreams.i18nhelper"
-    version = "0.0.7"
+    version = "0.0.8"
 
     repositories {
         mavenCentral()

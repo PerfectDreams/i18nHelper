@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
     api(project(":core"))
-    implementation("com.ibm.icu:icu4j:70.1")
+    implementation("com.ibm.icu:icu4j:78.1")
 }
 
 publishing {

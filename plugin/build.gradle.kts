@@ -14,9 +14,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.squareup:kotlinpoet:1.10.2")
-    implementation("org.yaml:snakeyaml:1.29")
-    implementation("com.ibm.icu:icu4j:70.1")
+    implementation("com.squareup:kotlinpoet:2.2.0")
+    implementation("org.yaml:snakeyaml:2.5")
+    implementation("com.ibm.icu:icu4j:78.1")
 }
 
 gradlePlugin {
